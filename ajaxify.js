@@ -114,7 +114,7 @@ function _on(eventName, elementSelector, handler, el = document) { //e.currentTa
 				break;
 			}
 		}
-	}, false);
+	}, !!eventName.iO("mo")); // true for mouse events, false for other events
 }
 
 function Hints(hints) {	 var myHints = (typeof hints === 'string' && hints.length) ? hints.split(", ") : false; //hints are passed as a comma separated string
@@ -744,7 +744,7 @@ class classHApi { constructor() {
 // <object> - fetch href part and continue with _request()
 // <URL> - set "h" variable of Rq hard and continue with _request()
 class classPronto { constructor() {
-	let $gthis = 0, requestTimer = 0, pfohints = 0, pvohints = 0,
+	let $gthis = 0, requestTimer = 0, pfohints = 0, pvohints = 0, pd = 150, ptim = 0,
 	selector = gsettings.selector,
 	prefetchoff = gsettings.prefetchoff,
 	refresh = gsettings.refresh,
@@ -787,8 +787,9 @@ let _init_p = () => {
 	hApi.a("=", window.location.href);
 	window.addEventListener("popstate", _onPop);
 	if (prefetchoff !== true) {
-		_on("mousedown", selector, _prefetch); //triggered on touchstart as well!
-		//_on("touchstart", selector, _prefetch);
+		_on("mouseenter", selector, _prefetch); // catch mouse enter and call prefetch
+		_on("mouseleave", selector, _prefstop); // catch mouse leave and cancel prefetch timeout timer
+		// _on("touchstart", selector, _prefetch);
 	}
 
 	var $body = jQuery("body");
@@ -798,15 +799,18 @@ let _init_p = () => {
 	frms.a("d", $gthis); 
 	if(gsettings.idleTime) slides.a("i"); 
 },
+	_prefstop = () => clearTimeout(ptim), // cancel prefetch timeout timer
 	_prefetch = (t, e) => {
 		if(prefetchoff === true) return;
 		if (!Rq.a("?", true)) return; 
-		var href = Rq.a("v", e, t); 
+		var href = Rq.a("v", e, t);
 		if (Rq.a("=", true) || !href || pfohints.find(href)) return; 
-		fn.a("+", href, () => { 
-			if (previewoff === true) return(false);
-			if (!_isInDivs() && (previewoff === false || !pvohints.find(href))) _click(t, e, true);
-		});
+		ptim = setTimeout(() => { // set prefetch delay with timeout
+			fn.a("+", href, () => { 
+				if (previewoff === true) return(false);
+				if (!_isInDivs() && (previewoff === false || !pvohints.find(href))) _click(t, e, true);
+			});
+		}, pd, t, e);
 	},
 	_isInDivs = () => {
 		var is = false;
