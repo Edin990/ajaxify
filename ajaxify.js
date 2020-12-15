@@ -90,7 +90,7 @@ let pages, memory, cache1, getPage, fn, scripts, detScripts, addAll, Rq, frms, o
 let doc=document, bdy,
     qa=(s,o=doc)=>o.querySelectorAll(s),
     qs=(s,o=doc)=>o.querySelector(s);
-let _selector = q => (r = "", q.each(e => r+= q[e].tagName.replace(/DIV/g, "#") + ((q[e].tagName == "DIV") ? q[e].id : "") + ", "), r.slice(0, -2));
+let _selector = q => (r = "", q.each(e => r+= q[e].tagName + "#" + ((q[e].tagName != "BODY") ? q[e].id : "") + ", "), r.slice(0, -2));
 
 function _trigger(t, e){ let ev = document.createEvent('HTMLEvents'); ev.initEvent("pronto." + t, true, false); ev.data = e ? e : Rq.a("e"); window.dispatchEvent(ev); }
 function _internal(url) {
@@ -257,7 +257,7 @@ let _lSel = $t => (
 	},
 	_lEls = $t => 
 		cache1.a() && !_isBody($t) && $t.forEach(function($el) { 
-			_ld(jQuery($el), cache1.a().find("#" + jQuery($el).attr("id"))); 
+			_ld(jQuery($el), cache1.a().find("#" + $el.getAttribute("id")));
 		}),
 	_isBody = $t => $t[0].tagName.toLowerCase() == "body" && (_ld(jQuery(bdy), cache1.a().find("#ajy-body")), 1),
 	_lAjax = (hin, pre) => { 
