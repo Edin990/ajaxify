@@ -865,7 +865,7 @@ let _init_p = () => {
 	},
 	_doRender = () => {
 		_trigger("load");
-		if(bodyClasses) { var classes = fn.a("body")[0].getAttribute("class"); bdy.setAttribute("class", classes ? classes : ""); }
+		if(bodyClasses) { var classes = fn.a("body").getAttribute("class"); bdy.setAttribute("class", classes ? classes : ""); }
 
 		var href = Rq.a("h"), title;
 		href = Rq.a("c", href);
