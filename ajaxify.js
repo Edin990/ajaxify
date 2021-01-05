@@ -15,11 +15,19 @@ Simplest plugin call:
 let ajaxify = new Ajaxify({options});
 Ajaxifies the whole site, dynamically replacing the elements specified in "elements" across pages
 
-//Options default values
 */
-var gsettings, dsettings = 
 
-{
+// The main plugin - Ajaxify
+// Is passed the global options 
+// Checks for necessary pre-conditions - otherwise gracefully degrades
+// Initialises sub-plugins
+// Calls Pronto
+class Ajaxify { constructor(options) {
+String.prototype.iO = function(s) { return this.toString().indexOf(s) + 1; }; //Intuitively better understandable shorthand for String.indexOf() - String.iO()
+let $ = this;
+
+//Options default values
+$.s = {
 //	basic config parameters
 	elements: "body", //selector for element IDs that are going to be swapped (e.g. "#el1, #el2, #el3")
 	selector : "a:not(.no-ajaxy)", //selector for links to trigger swapping - not elements to be swapped - i.e. a selection of links
@@ -51,18 +59,6 @@ var gsettings, dsettings =
 	pluginon : true, // Plugin set "on" or "off" (==false) manually
 	passCount: false // Show number of pass for debugging
 };
-
-// The main plugin - Ajaxify
-// Is passed the global options 
-// Checks for necessary pre-conditions - otherwise gracefully degrades
-// Initialises sub-plugins
-// Calls Pronto
-class Ajaxify { constructor(options) {
-let $ = this, settings, elements, pluginon, deltas, verbosity;
-
- //Intuitively better understandable shorthand for String.indexOf() - String.iO()
-String.prototype.iO = function(s) { return this.toString().indexOf(s) + 1; };
-
 
 //Module global variables
 let lvl = 0, pass = 0, currentURL = "", rootUrl = location.origin, api = window.history && window.history.pushState && window.history.replaceState,
@@ -119,7 +115,7 @@ function Hints(hints) {	 var myHints = (typeof hints === 'string' && hints.lengt
 	this.find = t => (!t || !myHints) ? false : myHints.some(h => t.iO(h)) //iterate through hints within passed text (t)
 }
 
-function lg(m){ gsettings.verbosity && console && console.log(m); }
+function lg(m){ $.s.verbosity && console && console.log(m); }
 
 // The stateful Cache class
 // Usage - parameter "o" values: 
@@ -152,12 +148,12 @@ class classCache { constructor() {
 // The stateful Memory class
 // Usage: $.memory(<URL>) - returns the same URL if not turned off internally
 class classMemory { constructor(options) {
-	let hints = 0, memoryoff = gsettings.memoryoff;
+	let hints = 0;
 
 	this.a = function (h) {
-		if(!hints) hints = new Hints(memoryoff); 
-		if (!h || memoryoff === true) return false; 
-		if (memoryoff === false) return h; 
+		if(!hints) hints = new Hints($.s.memoryoff); 
+		if (!h || $.s.memoryoff === true) return false; 
+		if ($.s.memoryoff === false) return h; 
 		return hints.find(h) ? false : h; 
 	};           
 }}
@@ -308,20 +304,13 @@ let _lSel = $t => (
 // <object> - handle one inline script
 // otherwise - delta loading
 class classScripts { constructor() {
-	let $s = false, inlhints = 0, skphints = 0, txt = 0,
-	canonical = gsettings.canonical,
-	inline = gsettings.inline,
-	inlinesync = gsettings.inlinesync,
-	inlinehints = gsettings.inlinehints,
-	inlineskip = gsettings.inlineskip,
-	inlineappend = gsettings.inlineappend,
-	style = gsettings.style;
+	let $s = false, inlhints = 0, skphints = 0, txt = 0;
 	
     this.a = function (o) {
 		if (o === "i") { 
 			if(!$s) $s = {}; 
-			if(!inlhints) inlhints = new Hints(inlinehints); 
-			if(!skphints) skphints = new Hints(inlineskip); 
+			if(!inlhints) inlhints = new Hints($.s.inlinehints); 
+			if(!skphints) skphints = new Hints($.s.inlineskip); 
 			return true;
 		}
 
@@ -332,7 +321,7 @@ class classScripts { constructor() {
 			return _addScripts($s); 
 		}
 
-		if (o === "c") return canonical && $s.can ? $s.can.getAttribute("href") : false;
+		if (o === "c") return $.s.canonical && $s.can ? $s.can.getAttribute("href") : false;
 		if (o === "d") return $.detScripts($s);
 		if (o && typeof o == "object") return _onetxt(o);
 
@@ -340,18 +329,18 @@ class classScripts { constructor() {
 		_addScripts($s);
 };
 let _allstyle = $s =>	 
-	!style || !$s || (
+	!$.s.style || !$s || (
 	qa("style", qs("head")).forEach(e => e.parentNode.removeChild(e)),
 	$s.forEach(el => _addstyle(el.textContent))
 	),
 	_onetxt = $s => 
 		(!(txt = $s.textContent).iO(").ajaxify(") && (!txt.iO("new Ajaxify(")) && 
-			((inline && !skphints.find(txt)) || $s.classList.contains("ajaxy") || 
+			(($.s.inline && !skphints.find(txt)) || $s.classList.contains("ajaxy") || 
 			inlhints.find(txt))
 		) && _addtxt($s),
 	_addtxt = $s => { 
 		if(!txt || !txt.length) return; 
-		if(inlineappend || ($s.getAttribute("type") && !$s.getAttribute("type").iO("text/javascript"))) try { return _apptxt($s); } catch (e) { }
+		if($.s.inlineappend || ($s.getAttribute("type") && !$s.getAttribute("type").iO("text/javascript"))) try { return _apptxt($s); } catch (e) { }
 
 		try { eval(txt); } catch (e1) { 
 			lg("Error in inline script : " + txt + "\nError code : " + e1);
@@ -362,7 +351,7 @@ let _allstyle = $s =>
 		return qs("body").appendChild(sc);
 	},
 	_addstyle = t => qs("head").appendChild(_parse('<style>' + t + '</style>')),
-	_addScripts = $s => ( $.addAll($s.c, "href"), inlinesync ? setTimeout(() => $.addAll($s.j, "src")) : $.addAll($s.j, "src"))
+	_addScripts = $s => ( $.addAll($s.c, "href"), $.s.inlinesync ? setTimeout(() => $.addAll($s.j, "src")) : $.addAll($s.j, "src"))
 }}
 // The DetScripts plugin - stands for "detach scripts"
 // Works on "$s" <object> that is passed in and fills it
@@ -393,19 +382,16 @@ let _rel = (lk, v) => Array.prototype.filter.call(lk, e => e.getAttribute("rel")
 // href - operate on stylesheets in the new selection
 // src - operate on JS scripts
 class classAddAll { constructor() {
-	let $scriptsO = [], $sCssO = [], $sO = [], PK = 0, url = 0, hints = 0,
-	deltas = gsettings.deltas,
-	asyncdef = gsettings.asyncdef,
-	alwayshints = gsettings.alwayshints;
+	let $scriptsO = [], $sCssO = [], $sO = [], PK = 0, url = 0, hints = 0;
 
 	this.a = function ($this, pk) {
-		if(!hints) hints = new Hints(alwayshints); //create Hints object during first pass
+		if(!hints) hints = new Hints($.s.alwayshints); //create Hints object during first pass
 		if(!$this.length) return; //ensure input
-		if(deltas === "n") return true; //Delta-loading completely disabled
+		if($.s.deltas === "n") return true; //Delta-loading completely disabled
 
 		PK = pk; //Copy "primary key" into internal variable
 
-		if(!deltas) return _allScripts($this); //process all scripts
+		if(!$.s.deltas) return _allScripts($this); //process all scripts
 		//deltas presumed to be "true" -> proceed with normal delta-loading
 
 		$scriptsO = PK == "href" ? $sCssO : $sO; //Copy old.  Stylesheets or JS
@@ -441,7 +427,7 @@ let _allScripts = $t => $t.forEach(e => _iScript(e)),
 		if(!url) return $.scripts($S); 
 		
 		var sc = document.createElement("script");
-		sc.async = asyncdef; 
+		sc.async = $.s.asyncdef; 
 		_copyAttributes(sc, $S); 
 		qs("head").appendChild(sc); 
 	},
@@ -547,15 +533,14 @@ let _setE = (p, t) => h = typeof (e = p) !== "string" ? (e.currentTarget && e.cu
 // d - set divs variable
 // a - Ajaxify all forms in divs
 class classFrms { constructor() {
-	let fm = 0, divs = 0,
-	forms = gsettings.forms;
+	let fm = 0, divs = 0;
 
 	this.a = function (o, p) {
-		if (!forms || !o) return; //ensure data
+		if (!$.s.forms || !o) return; //ensure data
 
 		if(o === "d") divs = p; //set divs variable
 		if(o === "a") divs.forEach(div => { //iterate through divs
-		Array.prototype.filter.call(qa(forms, div), function(e) { //filter forms
+		Array.prototype.filter.call(qa($.s.forms, div), function(e) { //filter forms
 			let c = e.getAttribute("action");
 			return(_internal(c && c.length > 0 ? c : currentURL)); //ensure "action"
 		}).forEach(frm => { //iterate through forms
@@ -633,8 +618,6 @@ let _iOffset = h => d.findIndex(e => e[0] == h)
 // + - add current page to offsets
 // ! - scroll to current page offset
 class classScrolly { constructor() {
-            
-	let scrolltop = gsettings.scrolltop;
 
 	this.a = function (o) {
 		if(!o) return; //ensure operator
@@ -651,14 +634,14 @@ class classScrolly { constructor() {
 			return;
 		}
 
-		if(scrolltop === "s") { //smart scroll enabled
+		if($.s.scrolltop === "s") { //smart scroll enabled
 			if(op === "+") $.offsets(); //add page offset
 			if(op === "!") _scrll($.offsets(o)); //scroll to stored position of page
 
 			return;
 		}
 
-		if(op !== "+" && scrolltop) _scrll(0); //otherwise scroll to top of page
+		if(op !== "+" && $.s.scrolltop) _scrll(0); //otherwise scroll to top of page
 
 		//default -> do nothing
 	};
@@ -688,14 +671,7 @@ class classHApi { constructor() {
 // <object> - fetch href part and continue with _request()
 // <URL> - set "h" variable of Rq hard and continue with _request()
 class classPronto { constructor() {
-	let $gthis = 0, requestTimer = 0, pfohints = 0, pd = 150, ptim = 0,
-	selector = gsettings.selector,
-	prefetchoff = gsettings.prefetchoff,
-	refresh = gsettings.refresh,
-	cb = gsettings.cb,
-	bodyClasses = gsettings.bodyClasses,
-	requestDelay = gsettings.requestDelay,
-	passCount = gsettings.passCount;
+	let $gthis = 0, requestTimer = 0, pfohints = 0, pd = 150, ptim = 0;
 
 	this.a = function ($this, h) {
 		if(!h) return; //ensure data
@@ -704,9 +680,9 @@ class classPronto { constructor() {
 			bdy = document.body;
 			if(!$this.length) $this = "body";
 			$gthis = qa($this); //copy selection to global selector
-			if(!pfohints) pfohints = new Hints(prefetchoff); //create Hints object during initialisation
+			if(!pfohints) pfohints = new Hints($.s.prefetchoff); //create Hints object during initialisation
 			$.frms = new classFrms().a; //initialise forms sub-plugin
-			if(gsettings.idleTime) $.slides = new classSlides().a; //initialise optional slideshow sub-plugin
+			if($.s.idleTime) $.slides = new classSlides().a; //initialise optional slideshow sub-plugin
 			$.scrolly = new classScrolly().a; //initialise scroll effects sub-plugin
 			$.offsets = new classOffsets().a;
 			$.hApi = new classHApi().a;
@@ -728,21 +704,21 @@ class classPronto { constructor() {
 let _init_p = () => {
 	$.hApi("=", window.location.href);
 	window.addEventListener("popstate", _onPop);
-	if (prefetchoff !== true) {
-		_on("mouseenter", selector, _preftime); // start prefetch timeout
-		_on("mouseleave", selector, _prefstop); // stop prefetch timeout
-		_on("touchstart", selector, _prefetch);
+	if ($.s.prefetchoff !== true) {
+		_on("mouseenter", $.s.selector, _preftime); // start prefetch timeout
+		_on("mouseleave", $.s.selector, _prefstop); // stop prefetch timeout
+		_on("touchstart", $.s.selector, _prefetch);
 	}
-	_on("click", selector, _click, bdy);
+	_on("click", $.s.selector, _click, bdy);
 	$.frms("d", qa("body"));
 	$.frms("a");
 	$.frms("d", $gthis);
-	if(gsettings.idleTime) $.slides("i");
+	if($.s.idleTime) $.slides("i");
 },
 	_preftime  = (t, e) => ptim = setTimeout(()=> _prefetch(t, e), pd), // call prefetch if timeout expires without being cleared by _prefstop
 	_prefstop = () => clearTimeout(ptim),
 	_prefetch = (t, e) => {
-		if(prefetchoff === true) return;
+		if($.s.prefetchoff === true) return;
 		if (!$.Rq("?", true)) return;
 		var href = $.Rq("v", e, t);
 		if ($.Rq("=", true) || !href || pfohints.find(href)) return;
@@ -766,7 +742,7 @@ let _init_p = () => {
 		$.scrolly("+");
 		_stopBubbling(e);
 		if($.Rq("=")) $.hApi("=");
-		if(refresh || !$.Rq("=")) _request(notPush);
+		if($.s.refresh || !$.Rq("=")) _request(notPush);
 	},
 	_request = notPush => {
 		$.Rq("!");
@@ -783,9 +759,9 @@ let _init_p = () => {
 	},
 	_render = () => {
 		_trigger("beforeload");
-		if(requestDelay) {
+		if($.s.requestDelay) {
 			if(requestTimer) clearTimeout(requestTimer);
-			requestTimer = setTimeout(_doRender, requestDelay);
+			requestTimer = setTimeout(_doRender, $.s.requestDelay);
 		} else _doRender();
 	},
 	_onPop = e => {
@@ -802,7 +778,7 @@ let _init_p = () => {
 	},
 	_doRender = () => {
 		_trigger("load");
-		if(bodyClasses) { var classes = $.fn("body").getAttribute("class"); bdy.setAttribute("class", classes ? classes : ""); }
+		if($.s.bodyClasses) { var classes = $.fn("body").getAttribute("class"); bdy.setAttribute("class", classes ? classes : ""); }
 
 		var href = $.Rq("h"), title;
 		href = $.Rq("c", href);
@@ -815,8 +791,8 @@ let _init_p = () => {
 		$.scrolly("!");
 		_gaCaptureView(href);
 		_trigger("render");
-		if(passCount) qs("#" + passCount).innerHTML = "Pass: " + pass;
-		if(cb) cb();
+		if($.s.passCount) qs("#" + $.s.passCount).innerHTML = "Pass: " + pass;
+		if($.s.cb) $.s.cb();
 	},
 	_gaCaptureView = href => {
 		href = "/" + href.replace(rootUrl,"");
@@ -836,13 +812,7 @@ let _init_p = () => {
 
 
 $.init = () => {
-	settings = Object.assign({"pluginon":true,"deltas":true,"verbosity":0}, options);
-	elements = settings["elements"];
-	pluginon = settings["pluginon"];
-	deltas = settings["deltas"];
-	verbosity = settings["verbosity"];
-	
-	var o = options;
+	let o = options;
 	if (!o || typeof(o) !== "string") {
 		if (document.readyState === "complete") run(); // ensure ajaxify is run if plugin script is loaded asynchronously
 		else window.onload = () => run(); // run ajaxify on page load
@@ -852,16 +822,16 @@ $.init = () => {
 };
 
 let run = () => {
-		gsettings = Object.assign(dsettings, settings);
+		$.s = Object.assign($.s, options);
 		$.pages = new classPages().a;
 		$.pronto = new classPronto().a;
-		if (load(settings)) { 
-			$.pronto(elements, "i"); 
-			if (deltas) $.scripts("1"); 
+		if (load()) { 
+			$.pronto($.s.elements, "i"); 
+			if ($.s.deltas) $.scripts("1"); 
 		}
 	},
 	load = () => { 
-		if (!api || !pluginon) { 
+		if (!api || !$.s.pluginon) { 
 			lg("Gracefully exiting...");
 			return false;
 		}
