@@ -35,6 +35,7 @@ var gsettings, dsettings =
 // script and style handling settings, prefetch
 	deltas : true, // true = deltas loaded, false = all scripts loaded
 	asyncin: true, // async load of dynamically inserted inline scripts, false = synchronous / true = asynchronous
+	sandbox: true, // run inline scripts in sandbox environment
 	asyncdef : false, // default async value for dynamically inserted external scripts, false = synchronous / true = asynchronous
 	alwayshints : false, // strings, - separated by ", " - if matched in any external script URL - these are always loaded on every page load
 	inline : true, // true = all inline scripts loaded, false = only specific inline scripts are loaded
@@ -363,6 +364,7 @@ class Ajaxify { constructor(options) {
 class classScripts { constructor() {
 	let $s = false, inlhints = 0, skphints = 0, txt = 0,
 	canonical = gsettings.canonical,
+	sandbox = gsettings.sandbox,
 	inline = gsettings.inline,
 	inlinehints = gsettings.inlinehints,
 	inlineskip = gsettings.inlineskip,
@@ -404,17 +406,23 @@ let _allstyle = $s =>
 	_addtxt = $s => { 
 		if(!txt || !txt.length) return; 
 		if(inlineappend || ($s.getAttribute("type") && !$s.getAttribute("type").iO("text/javascript"))) try { return _apptxt($s); } catch (e) { }
+		txt = _addScope($s);
 
 		try { eval(txt); } catch (e1) { 
 			lg("Error in inline script : " + txt + "\nError code : " + e1);
 		}
 	},
 	_apptxt = $s => { let sc = document.createElement("script"); _copyAttributes(sc, $s); sc.classList.add(inlineclass);
-		try {sc.appendChild(document.createTextNode($s.textContent))} catch(e) {sc.text = $s.textContent};
+		try {sc.appendChild(document.createTextNode(_addScope($s)))} catch(e) {sc.text = _addScope($s)};
 		return qs("body").appendChild(sc);
 	},
 	_addstyle = t => qs("head").appendChild(_parse('<style>' + t + '</style>')),
-	_addScripts = $s => ( addAll.a($s.c, "href"), addAll.a($s.j, "src") )
+	_addScripts = $s => ( addAll.a($s.c, "href"), addAll.a($s.j, "src") ),
+	_addScope = $s => {
+		let txt = $s.textContent, typ = $s.getAttribute("type"); 
+		if(!window.sbox) window.sbox = window;
+		return (sandbox && (!typ || typ == "text/javascript")) ? `try { with (sbox) { ${txt} } } catch (e) {lg(e)}`: txt;
+	}
 }}
 // The DetScripts plugin - stands for "detach scripts"
 // Works on "$s" <object> that is passed in and fills it
