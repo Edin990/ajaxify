@@ -34,6 +34,7 @@ var gsettings, dsettings =
  
 // script and style handling settings, prefetch
 	deltas : true, // true = deltas loaded, false = all scripts loaded
+	asyncin: true, // async load of dynamically inserted inline scripts, false = synchronous / true = asynchronous
 	asyncdef : false, // default async value for dynamically inserted external scripts, false = synchronous / true = asynchronous
 	alwayshints : false, // strings, - separated by ", " - if matched in any external script URL - these are always loaded on every page load
 	inline : true, // true = all inline scripts loaded, false = only specific inline scripts are loaded
@@ -447,6 +448,7 @@ class classAddAll { constructor() {
 	let $scriptsO = [], $sCssO = [], $sO = [], PK = 0, url = 0, hints = 0,
 	deltas = gsettings.deltas,
 	asyncdef = gsettings.asyncdef,
+	asyncin = gsettings.asyncin,
 	alwayshints = gsettings.alwayshints;
 
 	this.a = function ($this, pk) {
@@ -479,7 +481,7 @@ class classAddAll { constructor() {
 				return;
 			}
 
-			if(PK != "href" && !$t.classList.contains("no-ajaxy")) scripts.a($t); //Inline JS script? -> inject into DOM
+			if(PK != "href" && !$t.classList.contains("no-ajaxy")) asyncin ? setTimeout(() => scripts.a($t)) : scripts.a($t); //Inline JS script? -> inject into DOM
 		});
 };
 let _allScripts = $t => $t.forEach(e => _iScript(e)),
