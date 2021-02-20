@@ -84,7 +84,7 @@ scrr = 'script[src*="!"]',
 inlineclass = "ajy-inline";
 
 //Module global classes
-let pages, memory, cache1, getPage, fn, scripts, detScripts, addAll;
+let pages, memory, cache1, getPage, fn, scripts, detScripts;
 
 
 
@@ -366,7 +366,7 @@ let _allstyle = $s =>
 		return qs("body").appendChild(sc);
 	},
 	_addstyle = t => qs("head").appendChild(_parse('<style>' + t + '</style>')),
-	_addScripts = $s => ( addAll.a($s.c, "href"), inlinesync ? setTimeout(() => addAll.a($s.j, "src")) : addAll.a($s.j, "src"))
+	_addScripts = $s => ( $.addAll($s.c, "href"), inlinesync ? setTimeout(() => $.addAll($s.j, "src")) : $.addAll($s.j, "src"))
 }}
 // The DetScripts plugin - stands for "detach scripts"
 // Works on "$s" <object> that is passed in and fills it
@@ -878,7 +878,7 @@ let run = () => {
 		memory = new classMemory();
 		fn = getPage = new classGetPage();
 		detScripts = new classDetScripts();
-		addAll = new classAddAll();
+		$.addAll = new classAddAll().a;
 		$.Rq = new classRq().a;
 		return true; 
 	}
