@@ -84,7 +84,7 @@ scrr = 'script[src*="!"]',
 inlineclass = "ajy-inline";
 
 //Module global classes
-let pages, memory, cache1, getPage, fn, scripts, detScripts, addAll, Rq;
+let pages, memory, cache1, getPage, fn, scripts, detScripts, addAll;
 
 
 
@@ -94,7 +94,7 @@ let doc=document, bdy,
     qs=(s,o=doc)=>o.querySelector(s);
 
 let _parse = (s, pl) => (pl = document.createElement('div'), pl.insertAdjacentHTML('afterbegin', s), pl.firstElementChild); // HTML parser
-function _trigger(t, e){ let ev = document.createEvent('HTMLEvents'); ev.initEvent("pronto." + t, true, false); ev.data = e ? e : Rq.a("e"); window.dispatchEvent(ev); }
+function _trigger(t, e){ let ev = document.createEvent('HTMLEvents'); ev.initEvent("pronto." + t, true, false); ev.data = e ? e : $.Rq("e"); window.dispatchEvent(ev); }
 function _internal(url) {
 	if (!url) return false;
 	if (typeof(url) === "object") url = url.href;
@@ -239,7 +239,7 @@ let _lSel = $t => (
 ),
 	_lPage = (h, pre) => { 
 		if (h.iO("#")) h = h.split("#")[0]; 
-		if (Rq.a("is") || !cache1.a(h)) return _lAjax(h, pre); 
+		if ($.Rq("is") || !cache1.a(h)) return _lAjax(h, pre); 
 
 		plus = 0; 
 		if (cb) return cb(); 
@@ -263,7 +263,7 @@ let _lSel = $t => (
 		}),
 	_isBody = $t => $t[0].tagName.toLowerCase() == "body" && (_ld(bdy, qs("#ajy-body", cache1.a())), 1),
 	_lAjax = (hin, pre) => { 
-		var ispost = Rq.a("is"); 
+		var ispost = $.Rq("is"); 
 		if (pre) rt="p"; else rt="c"; 
 
 		ac = new AbortController(); // set abort controller
@@ -273,7 +273,7 @@ let _lSel = $t => (
 			cache: "default",
 			mode: "same-origin",
 			headers: {"X-Requested-With": "XMLHttpRequest"},
-			body: (ispost) ? Rq.a("d") : null,
+			body: (ispost) ? $.Rq("d") : null,
 			signal: ac.signal
 		}).then(r => {
 			if (!r.ok || !_isHtml(r)) {
@@ -575,12 +575,12 @@ class classFrms { constructor() {
 			if (a && a.length > 0) h = a; //found -> store
 			else h = currentURL; //not found -> select current URL
 
-			Rq.a("v", q); //validate request
+			$.Rq("v", q); //validate request
 
 			if (g == "get") h = _b(h, p); //GET -> copy URL parameters
 			else {
-				Rq.a("is", true); //set is POST in request data
-				Rq.a("d", p); //save data in request data
+				$.Rq("is", true); //set is POST in request data
+				$.Rq("d", p); //save data in request data
 			}
 
 			_trigger("submit", h); //raise pronto.submit event
@@ -719,13 +719,13 @@ class classPronto { constructor() {
 		}
 
 		if(typeof(h) === "object") { //jump to internal page programmatically -> handler for forms sub-plugin
-			Rq.a("h", h);
+			$.Rq("h", h);
 			_request();
 			return;
 		}
 
 		if(h.iO("/")) { //jump to internal page programmatically -> default handler
-			Rq.a("h", h);
+			$.Rq("h", h);
 			_request(true);
 		}
 	};
@@ -747,9 +747,9 @@ let _init_p = () => {
 	_prefstop = () => clearTimeout(ptim),
 	_prefetch = (t, e) => {
 		if(prefetchoff === true) return;
-		if (!Rq.a("?", true)) return;
-		var href = Rq.a("v", e, t);
-		if (Rq.a("=", true) || !href || pfohints.find(href)) return;
+		if (!$.Rq("?", true)) return;
+		var href = $.Rq("v", e, t);
+		if ($.Rq("=", true) || !href || pfohints.find(href)) return;
 		fn.a("+", href, () => false);
 	},
 	_stopBubbling = e => (
@@ -758,8 +758,8 @@ let _init_p = () => {
 		e.stopImmediatePropagation()
 	),
 	_click = (t, e, notPush) => {
-		if(!Rq.a("?")) return;
-		var href = Rq.a("v", e, t);
+		if(!$.Rq("?")) return;
+		var href = $.Rq("v", e, t);
 		if(!href || _exoticKey(t)) return;
 		if(href.substr(-1) ==="#") return true;
 		if(_hashChange()) {
@@ -769,14 +769,14 @@ let _init_p = () => {
 
 		$.scrolly("+");
 		_stopBubbling(e);
-		if(Rq.a("=")) $.hApi("=");
-		if(refresh || !Rq.a("=")) _request(notPush);
+		if($.Rq("=")) $.hApi("=");
+		if(refresh || !$.Rq("=")) _request(notPush);
 	},
 	_request = notPush => {
-		Rq.a("!");
-		if(notPush) Rq.a("p", false);
+		$.Rq("!");
+		if(notPush) $.Rq("p", false);
 		_trigger("request");
-		fn.a(Rq.a("h"), err => {
+		fn.a($.Rq("h"), err => {
 			if (err) {
 				lg("Error in _request : " + err);
 				_trigger("error", err);
@@ -795,9 +795,9 @@ let _init_p = () => {
 	_onPop = e => {
 		var url = window.location.href;
 
-		Rq.a("i");
-		Rq.a("h", url);
-		Rq.a("p", false);
+		$.Rq("i");
+		$.Rq("h", url);
+		$.Rq("p", false);
 		$.scrolly("+");
 
 		if (!url || url === currentURL) return;
@@ -808,12 +808,12 @@ let _init_p = () => {
 		_trigger("load");
 		if(bodyClasses) { var classes = fn.a("body").getAttribute("class"); bdy.setAttribute("class", classes ? classes : ""); }
 
-		var href = Rq.a("h"), title;
-		href = Rq.a("c", href);
+		var href = $.Rq("h"), title;
+		href = $.Rq("c", href);
 
-		$.hApi(Rq.a("p") ? "+" : "=", href);
+		$.hApi($.Rq("p") ? "+" : "=", href);
 		if(title = fn.a("title")) qs("title").innerHTML = title.innerHTML;
-		Rq.a("C", fn.a("-", $gthis));
+		$.Rq("C", fn.a("-", $gthis));
 		$.frms("a");
 
 		$.scrolly("!");
@@ -828,12 +828,12 @@ let _init_p = () => {
 		else if (typeof window._gaq !== "undefined") window._gaq.push(["_trackPageview", href]);
 	},
 	_exoticKey = (t) => {
-		var href = Rq.a("h"), e = Rq.a("e"), tgt = e.currentTarget.target || t.target;
+		var href = $.Rq("h"), e = $.Rq("e"), tgt = e.currentTarget.target || t.target;
 		return (e.which > 1 || e.metaKey || e.ctrlKey || e.shiftKey || e.altKey || tgt === "_blank"
 			|| href.iO("wp-login") || href.iO("wp-admin"));
 	},
 	_hashChange = () => {
-		var e = Rq.a("e");
+		var e = $.Rq("e");
 		return (e.hash && e.href.replace(e.hash, "") === window.location.href.replace(location.hash, "") || e.href === window.location.href + "#");
 	}
 }}
@@ -879,7 +879,7 @@ let run = () => {
 		fn = getPage = new classGetPage();
 		detScripts = new classDetScripts();
 		addAll = new classAddAll();
-		Rq = new classRq();
+		$.Rq = new classRq().a;
 		return true; 
 	}
 $.init(); // initialize Ajaxify on definition
