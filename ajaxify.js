@@ -84,7 +84,7 @@ scrr = 'script[src*="!"]',
 inlineclass = "ajy-inline";
 
 //Module global classes
-let pages, memory, cache1, getPage, fn, scripts, detScripts, addAll, Rq, frms, offsets, scrolly, hApi, pronto;
+let pages, memory, cache1, getPage, fn, scripts, detScripts, addAll, Rq, frms, offsets, scrolly, hApi;
 
 
 
@@ -277,7 +277,7 @@ let _lSel = $t => (
 			signal: ac.signal
 		}).then(r => {
 			if (!r.ok || !_isHtml(r)) {
-				if (!pre) {location.href = hin; _cl(); pronto.a(0, currentURL);}
+				if (!pre) {location.href = hin; _cl(); $.pronto(0, currentURL);}
 				return;
 			}
 			rsp = r; // store response
@@ -584,7 +584,7 @@ class classFrms { constructor() {
 			}
 
 			_trigger("submit", h); //raise pronto.submit event
-			pronto.a(0, { href: h }); //programmatically change page
+			$.pronto(0, { href: h }); //programmatically change page
 
 			q.preventDefault(); //prevent default form action
 			return(false); //success -> disable default behaviour
@@ -852,15 +852,15 @@ $.init = () => {
 		else window.onload = () => run(); // run ajaxify on page load
 		return $;
 	}
-	else return pronto.a(0, o);
+	else return $.pronto(0, o);
 };
 
 let run = () => {
 		gsettings = Object.assign(dsettings, settings);
 		pages = new classPages();
-		pronto = new classPronto();
+		$.pronto = new classPronto().a;
 		if (load(settings)) { 
-			pronto.a(elements, "i"); 
+			$.pronto(elements, "i"); 
 			if (deltas) scripts.a("1"); 
 		}
 	},
