@@ -84,7 +84,7 @@ scrr = 'script[src*="!"]',
 inlineclass = "ajy-inline";
 
 //Module global classes
-let pages, memory, cache1;
+let pages, memory;
 
 
 
@@ -131,7 +131,7 @@ function lg(m){ gsettings.verbosity && console && console.log(m); }
 // <URL> - returns page with specified URL
 // <object> - saves the page in cache
 // f - flushes the cache
-class classCache1 { constructor() {
+class classCache { constructor() {
 	let d = false;
             
 	this.a = function (o) {
@@ -204,7 +204,7 @@ class classGetPage { constructor() {
 	let rsp = 0, cb = 0, plus = 0, rt = "", ct = 0, rc = 0, ac = 0;
             
 	this.a = function (o, p, p2) { 
-		if (!o) return cache1.a(); 
+		if (!o) return $.cache(); 
 
 		if (o.iO("/")) { 
 			cb = p; 
@@ -223,11 +223,11 @@ class classGetPage { constructor() {
 		if (o === "-") return _lSel(p); 
 		if (o === "x") return rsp; 
 
-		if (!cache1.a()) return;
-		if (o === "body") return qs("#ajy-" + o, cache1.a());
-		if (o === "script") return qa(o, cache1.a()); 
+		if (!$.cache()) return;
+		if (o === "body") return qs("#ajy-" + o, $.cache());
+		if (o === "script") return qa(o, $.cache()); 
 
-		return qs((o === "title") ?	o : ".ajy-" + o, cache1.a()); 
+		return qs((o === "title") ?	o : ".ajy-" + o, $.cache()); 
 };
 let _lSel = $t => (
 	pass++, 
@@ -239,7 +239,7 @@ let _lSel = $t => (
 ),
 	_lPage = (h, pre) => { 
 		if (h.iO("#")) h = h.split("#")[0]; 
-		if ($.Rq("is") || !cache1.a(h)) return _lAjax(h, pre); 
+		if ($.Rq("is") || !$.cache(h)) return _lAjax(h, pre); 
 
 		plus = 0; 
 		if (cb) return cb(); 
@@ -258,10 +258,10 @@ let _lSel = $t => (
 		$t.innerHTML = $c.innerHTML;
 	},
 	_lEls = $t => 
-		cache1.a() && !_isBody($t) && $t.forEach(function($el) { 
-			_ld($el, qs("#" + $el.getAttribute("id"), cache1.a()));
+		$.cache() && !_isBody($t) && $t.forEach(function($el) { 
+			_ld($el, qs("#" + $el.getAttribute("id"), $.cache()));
 		}),
-	_isBody = $t => $t[0].tagName.toLowerCase() == "body" && (_ld(bdy, qs("#ajy-body", cache1.a())), 1),
+	_isBody = $t => $t[0].tagName.toLowerCase() == "body" && (_ld(bdy, qs("#ajy-body", $.cache())), 1),
 	_lAjax = (hin, pre) => { 
 		var ispost = $.Rq("is"); 
 		if (pre) rt="p"; else rt="c"; 
@@ -298,7 +298,7 @@ let _lSel = $t => (
 		}).finally(() => rc--); // reset active request counter
 	},
 	_cl = c => (plus = 0, (!c) ? cb = 0 : 0), // clear plus AND/OR callback
-	_cache = (href, h, err) => cache1.a(_parse(_parseHTML(h))) && (pages.a([href, cache1.a()]), 1) && cb && cb(err),
+	_cache = (href, h, err) => $.cache(_parse(_parseHTML(h))) && (pages.a([href, $.cache()]), 1) && cb && cb(err),
 	_isHtml = x => (ct = x.headers.get("content-type")) && (ct.iO("html") || ct.iO("form-")),
 	_parseHTML = h => document.createElement("html").innerHTML = _replD(h).trim(),
 	_replD = h => String(h).replace(docType, "").replace(tagso, div12).replace(tagsod, divid12).replace(tagsc, "</div>")
@@ -874,7 +874,7 @@ let run = () => {
 		
 		$.scripts = new classScripts().a;
 		$.scripts("i"); 
-		cache1 = new classCache1();
+		$.cache = new classCache().a;
 		memory = new classMemory();
 		$.fn = $.getPage = new classGetPage().a;
 		$.detScripts = new classDetScripts().a;
