@@ -83,10 +83,6 @@ linkr = 'link[href*="!"]',
 scrr = 'script[src*="!"]',
 inlineclass = "ajy-inline";
 
-//Module global classes
-let pages;
-
-
 
 //Global helpers
 let doc=document, bdy,
@@ -139,9 +135,9 @@ class classCache { constructor() {
 	
 		if (typeof o === "string") { //URL or "f" passed
 			if(o === "f") { //"f" passed -> flush
-				pages.a("f"); //delegate flush to $.pages
+				$.pages("f"); //delegate flush to $.pages
 				lg("Cache flushed");
-			} else d = pages.a($.memory(o)); //URL passed -> look up page in memory
+			} else d = $.pages($.memory(o)); //URL passed -> look up page in memory
 
 			return d; //return cached page
 		}
@@ -298,7 +294,7 @@ let _lSel = $t => (
 		}).finally(() => rc--); // reset active request counter
 	},
 	_cl = c => (plus = 0, (!c) ? cb = 0 : 0), // clear plus AND/OR callback
-	_cache = (href, h, err) => $.cache(_parse(_parseHTML(h))) && (pages.a([href, $.cache()]), 1) && cb && cb(err),
+	_cache = (href, h, err) => $.cache(_parse(_parseHTML(h))) && ($.pages([href, $.cache()]), 1) && cb && cb(err),
 	_isHtml = x => (ct = x.headers.get("content-type")) && (ct.iO("html") || ct.iO("form-")),
 	_parseHTML = h => document.createElement("html").innerHTML = _replD(h).trim(),
 	_replD = h => String(h).replace(docType, "").replace(tagso, div12).replace(tagsod, divid12).replace(tagsc, "</div>")
@@ -857,7 +853,7 @@ $.init = () => {
 
 let run = () => {
 		gsettings = Object.assign(dsettings, settings);
-		pages = new classPages();
+		$.pages = new classPages().a;
 		$.pronto = new classPronto().a;
 		if (load(settings)) { 
 			$.pronto(elements, "i"); 
