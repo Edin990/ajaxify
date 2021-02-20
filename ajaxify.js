@@ -84,7 +84,7 @@ scrr = 'script[src*="!"]',
 inlineclass = "ajy-inline";
 
 //Module global classes
-let pages, memory, cache1, getPage, fn, scripts, detScripts, addAll, Rq, frms;
+let pages, memory, cache1, getPage, fn, scripts, detScripts, addAll, Rq;
 
 
 
@@ -709,7 +709,7 @@ class classPronto { constructor() {
 			if(!$this.length) $this = "body";
 			$gthis = qa($this); //copy selection to global selector
 			if(!pfohints) pfohints = new Hints(prefetchoff); //create Hints object during initialisation
-			frms = new classFrms(); //initialise forms sub-plugin
+			$.frms = new classFrms().a; //initialise forms sub-plugin
 			if(gsettings.idleTime) $.slides = new classSlides().a; //initialise optional slideshow sub-plugin
 			$.scrolly = new classScrolly().a; //initialise scroll effects sub-plugin
 			$.offsets = new classOffsets().a;
@@ -738,9 +738,9 @@ let _init_p = () => {
 		_on("touchstart", selector, _prefetch);
 	}
 	_on("click", selector, _click, bdy);
-	frms.a("d", qa("body"));
-	frms.a("a");
-	frms.a("d", $gthis);
+	$.frms("d", qa("body"));
+	$.frms("a");
+	$.frms("d", $gthis);
 	if(gsettings.idleTime) $.slides("i");
 },
 	_preftime  = (t, e) => ptim = setTimeout(()=> _prefetch(t, e), pd), // call prefetch if timeout expires without being cleared by _prefstop
@@ -814,7 +814,7 @@ let _init_p = () => {
 		$.hApi(Rq.a("p") ? "+" : "=", href);
 		if(title = fn.a("title")) qs("title").innerHTML = title.innerHTML;
 		Rq.a("C", fn.a("-", $gthis));
-		frms.a("a");
+		$.frms("a");
 
 		$.scrolly("!");
 		_gaCaptureView(href);
