@@ -84,7 +84,7 @@ scrr = 'script[src*="!"]',
 inlineclass = "ajy-inline";
 
 //Module global classes
-let pages, memory, cache1, getPage, fn, scripts, detScripts, addAll, Rq, frms, offsets;
+let pages, memory, cache1, getPage, fn, scripts, detScripts, addAll, Rq, frms;
 
 
 
@@ -656,8 +656,8 @@ class classScrolly { constructor() {
 		}
 
 		if(scrolltop === "s") { //smart scroll enabled
-			if(op === "+") offsets.a(); //add page offset
-			if(op === "!") _scrll(offsets.a(o)); //scroll to stored position of page
+			if(op === "+") $.offsets(); //add page offset
+			if(op === "!") _scrll($.offsets(o)); //scroll to stored position of page
 
 			return;
 		}
@@ -712,7 +712,7 @@ class classPronto { constructor() {
 			frms = new classFrms(); //initialise forms sub-plugin
 			if(gsettings.idleTime) $.slides = new classSlides().a; //initialise optional slideshow sub-plugin
 			$.scrolly = new classScrolly().a; //initialise scroll effects sub-plugin
-			offsets = new classOffsets();
+			$.offsets = new classOffsets().a;
 			$.hApi = new classHApi().a;
 			_init_p(); //initialise Pronto sub-plugin
 			return $this; //return query selector for chaining
