@@ -84,7 +84,7 @@ scrr = 'script[src*="!"]',
 inlineclass = "ajy-inline";
 
 //Module global classes
-let pages, memory;
+let pages;
 
 
 
@@ -141,7 +141,7 @@ class classCache { constructor() {
 			if(o === "f") { //"f" passed -> flush
 				pages.a("f"); //delegate flush to $.pages
 				lg("Cache flushed");
-			} else d = pages.a(memory.a(o)); //URL passed -> look up page in memory
+			} else d = pages.a($.memory(o)); //URL passed -> look up page in memory
 
 			return d; //return cached page
 		}
@@ -154,7 +154,7 @@ class classCache { constructor() {
  }}
 
 // The stateful Memory class
-// Usage: memory.a(<URL>) - returns the same URL if not turned off internally
+// Usage: $.memory(<URL>) - returns the same URL if not turned off internally
 class classMemory { constructor(options) {
 	let hints = 0, memoryoff = gsettings.memoryoff;
 
@@ -875,7 +875,7 @@ let run = () => {
 		$.scripts = new classScripts().a;
 		$.scripts("i"); 
 		$.cache = new classCache().a;
-		memory = new classMemory();
+		$.memory = new classMemory().a;
 		$.fn = $.getPage = new classGetPage().a;
 		$.detScripts = new classDetScripts().a;
 		$.addAll = new classAddAll().a;
