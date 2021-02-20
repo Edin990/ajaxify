@@ -84,7 +84,7 @@ scrr = 'script[src*="!"]',
 inlineclass = "ajy-inline";
 
 //Module global classes
-let pages, memory, cache1, getPage, fn, scripts;
+let pages, memory, cache1, getPage, fn;
 
 
 
@@ -233,9 +233,9 @@ let _lSel = $t => (
 	pass++, 
 	_lEls($t), 
 	qa("body > script").forEach(e => (e.classList.contains(inlineclass)) ? e.parentNode.removeChild(e) : false), 
-	scripts.a(true), 
-	scripts.a("s"), 
-	scripts.a("c") 
+	$.scripts(true), 
+	$.scripts("s"), 
+	$.scripts("c") 
 ),
 	_lPage = (h, pre) => { 
 		if (h.iO("#")) h = h.split("#")[0]; 
@@ -340,7 +340,7 @@ class classScripts { constructor() {
 		if (o === "d") return $.detScripts($s);
 		if (o && typeof o == "object") return _onetxt(o);
 
-		if (scripts.a("d")) return;
+		if ($.scripts("d")) return;
 		_addScripts($s);
 };
 let _allstyle = $s =>	 
@@ -432,7 +432,7 @@ class classAddAll { constructor() {
 				return;
 			}
 
-			if(PK != "href" && !$t.classList.contains("no-ajaxy")) scripts.a($t); //Inline JS script? -> inject into DOM
+			if(PK != "href" && !$t.classList.contains("no-ajaxy")) $.scripts($t); //Inline JS script? -> inject into DOM
 		});
 };
 let _allScripts = $t => $t.forEach(e => _iScript(e)),
@@ -442,7 +442,7 @@ let _allScripts = $t => $t.forEach(e => _iScript(e)),
 		url = $S.getAttribute(PK);
 
 		if(PK == "href") return qs("head").appendChild(_parse(linki.replace("*", url))); 
-		if(!url) return scripts.a($S); 
+		if(!url) return $.scripts($S); 
 		
 		var sc = document.createElement("script");
 		sc.async = asyncdef; 
@@ -861,7 +861,7 @@ let run = () => {
 		$.pronto = new classPronto().a;
 		if (load(settings)) { 
 			$.pronto(elements, "i"); 
-			if (deltas) scripts.a("1"); 
+			if (deltas) $.scripts("1"); 
 		}
 	},
 	load = () => { 
@@ -872,8 +872,8 @@ let run = () => {
 		
 		lg("Ajaxify loaded..."); //verbosity option steers, whether this initialisation message is output
 		
-		scripts = new classScripts();
-		scripts.a("i"); 
+		$.scripts = new classScripts().a;
+		$.scripts("i"); 
 		cache1 = new classCache1();
 		memory = new classMemory();
 		fn = getPage = new classGetPage();
