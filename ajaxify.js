@@ -84,7 +84,7 @@ scrr = 'script[src*="!"]',
 inlineclass = "ajy-inline";
 
 //Module global classes
-let pages, memory, cache1, getPage, fn, scripts, detScripts, addAll, Rq, frms, offsets, scrolly, hApi;
+let pages, memory, cache1, getPage, fn, scripts, detScripts, addAll, Rq, frms, offsets, scrolly;
 
 
 
@@ -713,7 +713,7 @@ class classPronto { constructor() {
 			if(gsettings.idleTime) $.slides = new classSlides().a; //initialise optional slideshow sub-plugin
 			scrolly = new classScrolly(); //initialise scroll effects sub-plugin
 			offsets = new classOffsets();
-			hApi = new classHApi();
+			$.hApi = new classHApi().a;
 			_init_p(); //initialise Pronto sub-plugin
 			return $this; //return query selector for chaining
 		}
@@ -730,7 +730,7 @@ class classPronto { constructor() {
 		}
 	};
 let _init_p = () => {
-	hApi.a("=", window.location.href);
+	$.hApi("=", window.location.href);
 	window.addEventListener("popstate", _onPop);
 	if (prefetchoff !== true) {
 		_on("mouseenter", selector, _preftime); // start prefetch timeout
@@ -763,13 +763,13 @@ let _init_p = () => {
 		if(!href || _exoticKey(t)) return;
 		if(href.substr(-1) ==="#") return true;
 		if(_hashChange()) {
-			hApi.a("=", href);
+			$.hApi("=", href);
 			return true;
 		}
 
 		scrolly.a("+");
 		_stopBubbling(e);
-		if(Rq.a("=")) hApi.a("=");
+		if(Rq.a("=")) $.hApi("=");
 		if(refresh || !Rq.a("=")) _request(notPush);
 	},
 	_request = notPush => {
@@ -811,7 +811,7 @@ let _init_p = () => {
 		var href = Rq.a("h"), title;
 		href = Rq.a("c", href);
 
-		hApi.a(Rq.a("p") ? "+" : "=", href);
+		$.hApi(Rq.a("p") ? "+" : "=", href);
 		if(title = fn.a("title")) qs("title").innerHTML = title.innerHTML;
 		Rq.a("C", fn.a("-", $gthis));
 		frms.a("a");
