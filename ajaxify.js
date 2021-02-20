@@ -84,7 +84,7 @@ scrr = 'script[src*="!"]',
 inlineclass = "ajy-inline";
 
 //Module global classes
-let pages, memory, cache1, getPage, fn, scripts, detScripts;
+let pages, memory, cache1, getPage, fn, scripts;
 
 
 
@@ -332,12 +332,12 @@ class classScripts { constructor() {
 		if (o === "s") return _allstyle($s.y); 
 
 		if (o === "1") { 
-			detScripts.a($s); 
+			$.detScripts($s); 
 			return _addScripts($s); 
 		}
 
 		if (o === "c") return canonical && $s.can ? $s.can.getAttribute("href") : false;
-		if (o === "d") return detScripts.a($s);
+		if (o === "d") return $.detScripts($s);
 		if (o && typeof o == "object") return _onetxt(o);
 
 		if (scripts.a("d")) return;
@@ -877,7 +877,7 @@ let run = () => {
 		cache1 = new classCache1();
 		memory = new classMemory();
 		fn = getPage = new classGetPage();
-		detScripts = new classDetScripts();
+		$.detScripts = new classDetScripts().a;
 		$.addAll = new classAddAll().a;
 		$.Rq = new classRq().a;
 		return true; 
