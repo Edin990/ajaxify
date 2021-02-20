@@ -84,7 +84,7 @@ scrr = 'script[src*="!"]',
 inlineclass = "ajy-inline";
 
 //Module global classes
-let pages, memory, cache1, getPage, fn, scripts, detScripts, addAll, Rq, frms, offsets, scrolly;
+let pages, memory, cache1, getPage, fn, scripts, detScripts, addAll, Rq, frms, offsets;
 
 
 
@@ -711,7 +711,7 @@ class classPronto { constructor() {
 			if(!pfohints) pfohints = new Hints(prefetchoff); //create Hints object during initialisation
 			frms = new classFrms(); //initialise forms sub-plugin
 			if(gsettings.idleTime) $.slides = new classSlides().a; //initialise optional slideshow sub-plugin
-			scrolly = new classScrolly(); //initialise scroll effects sub-plugin
+			$.scrolly = new classScrolly().a; //initialise scroll effects sub-plugin
 			offsets = new classOffsets();
 			$.hApi = new classHApi().a;
 			_init_p(); //initialise Pronto sub-plugin
@@ -767,7 +767,7 @@ let _init_p = () => {
 			return true;
 		}
 
-		scrolly.a("+");
+		$.scrolly("+");
 		_stopBubbling(e);
 		if(Rq.a("=")) $.hApi("=");
 		if(refresh || !Rq.a("=")) _request(notPush);
@@ -798,7 +798,7 @@ let _init_p = () => {
 		Rq.a("i");
 		Rq.a("h", url);
 		Rq.a("p", false);
-		scrolly.a("+");
+		$.scrolly("+");
 
 		if (!url || url === currentURL) return;
 		_trigger("request");
@@ -816,7 +816,7 @@ let _init_p = () => {
 		Rq.a("C", fn.a("-", $gthis));
 		frms.a("a");
 
-		scrolly.a("!");
+		$.scrolly("!");
 		_gaCaptureView(href);
 		_trigger("render");
 		if(passCount) qs("#" + passCount).innerHTML = "Pass: " + pass;
