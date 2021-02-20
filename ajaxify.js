@@ -52,16 +52,20 @@ var gsettings, dsettings =
 	passCount: false // Show number of pass for debugging
 };
 
-
-
-
+// The main plugin - Ajaxify
+// Is passed the global options 
+// Checks for necessary pre-conditions - otherwise gracefully degrades
+// Initialises sub-plugins
+// Calls Pronto
+class Ajaxify { constructor(options) {
+let $ = this, settings, elements, pluginon, deltas, verbosity;
 
  //Intuitively better understandable shorthand for String.indexOf() - String.iO()
 String.prototype.iO = function(s) { return this.toString().indexOf(s) + 1; };
 
 
 //Module global variables
-var lvl = 0, pass = 0, currentURL = "", rootUrl = location.origin, api = window.history && window.history.pushState && window.history.replaceState,
+let lvl = 0, pass = 0, currentURL = "", rootUrl = location.origin, api = window.history && window.history.pushState && window.history.replaceState,
 
 //Regexes for escaping fetched HTML of a whole page - best of Baluptons Ajaxify
 //Makes it possible to pre-fetch an entire page
@@ -300,62 +304,6 @@ let _lSel = $t => (
 	_replD = h => String(h).replace(docType, "").replace(tagso, div12).replace(tagsod, divid12).replace(tagsc, "</div>")
 }}
 
-// The main plugin - Ajaxify
-// Is passed the global options 
-// Checks for necessary pre-conditions - otherwise gracefully degrades
-// Initialises sub-plugins
-// Calls Pronto
-class Ajaxify { constructor(options) {
-	let $ = this, settings, elements, pluginon, deltas, verbosity;
-	
-	$.init = () => {
-		settings = Object.assign({"pluginon":true,"deltas":true,"verbosity":0}, options);
-		elements = settings["elements"];
-		pluginon = settings["pluginon"];
-		deltas = settings["deltas"];
-		verbosity = settings["verbosity"];
-		
-		var o = options;
-		if (!o || typeof(o) !== "string") {
-			//if (document.readyState === "complete") run(); // ensure ajaxify is run if plugin script is loaded asynchronously
-			//else window.onload = () => run(); // run ajaxify on page load
-			if (document.readyState === "complete" || 
-				(document.readyState !== "loading" && !document.documentElement.doScroll)) run();
-			else document.addEventListener('DOMContentLoaded', run);
-			return $;
-		}
-		else return pronto.a(0, o);
-	};
-	
-	let run = () => {
-			gsettings = Object.assign(dsettings, settings);
-			pages = new classPages();
-			pronto = new classPronto();
-			if (load(settings)) { 
-				pronto.a(elements, "i"); 
-				if (deltas) scripts.a("1"); 
-			}
-		},
-		load = s => { 
-			if (!api || !pluginon) { 
-				lg("Gracefully exiting...");
-				return false;
-			}
-			
-			lg("Ajaxify loaded..."); //verbosity option steers, whether this initialisation message is output
-			
-			scripts = new classScripts();
-			scripts.a("i"); 
-			cache1 = new classCache1();
-			memory = new classMemory();
-			fn = getPage = new classGetPage();
-			detScripts = new classDetScripts();
-			addAll = new classAddAll();
-			Rq = new classRq();
-			return true; 
-		}
-	$.init(); // initialize Ajaxify on definition
-}}
 
 // The stateful Scripts plugin
 // First parameter "o" is switch:
@@ -888,4 +836,52 @@ let _init_p = () => {
 		var e = Rq.a("e");
 		return (e.hash && e.href.replace(e.hash, "") === window.location.href.replace(location.hash, "") || e.href === window.location.href + "#");
 	}
+}}
+
+
+$.init = () => {
+	settings = Object.assign({"pluginon":true,"deltas":true,"verbosity":0}, options);
+	elements = settings["elements"];
+	pluginon = settings["pluginon"];
+	deltas = settings["deltas"];
+	verbosity = settings["verbosity"];
+	
+	var o = options;
+	if (!o || typeof(o) !== "string") {
+		if (document.readyState === "complete") run(); // ensure ajaxify is run if plugin script is loaded asynchronously
+		else window.onload = () => run(); // run ajaxify on page load
+		return $;
+	}
+	else return pronto.a(0, o);
+};
+
+let run = () => {
+		gsettings = Object.assign(dsettings, settings);
+		pages = new classPages();
+		pronto = new classPronto();
+		if (load(settings)) { 
+			pronto.a(elements, "i"); 
+			if (deltas) scripts.a("1"); 
+		}
+	},
+	load = () => { 
+		if (!api || !pluginon) { 
+			lg("Gracefully exiting...");
+			return false;
+		}
+		
+		lg("Ajaxify loaded..."); //verbosity option steers, whether this initialisation message is output
+		
+		scripts = new classScripts();
+		scripts.a("i"); 
+		cache1 = new classCache1();
+		memory = new classMemory();
+		fn = getPage = new classGetPage();
+		detScripts = new classDetScripts();
+		addAll = new classAddAll();
+		Rq = new classRq();
+		return true; 
+	}
+$.init(); // initialize Ajaxify on definition
+
 }}
