@@ -84,7 +84,7 @@ scrr = 'script[src*="!"]',
 inlineclass = "ajy-inline";
 
 //Module global classes
-let pages, memory, cache1, getPage, fn;
+let pages, memory, cache1;
 
 
 
@@ -378,10 +378,10 @@ class classDetScripts { constructor() {
 	let head = 0, lk = 0, j = 0;
             
 	this.a = function ($s) {
-		head = pass ? fn.a("head") : qs("head"); //If "pass" is 0 -> fetch head from DOM, otherwise from target page
+		head = pass ? $.fn("head") : qs("head"); //If "pass" is 0 -> fetch head from DOM, otherwise from target page
 		if (!head) return true;
 		lk = qa(pass ? ".ajy-link" : "link", head); //If "pass" is 0 -> fetch links from DOM, otherwise from target page
-		j = pass ? fn.a("script") : qa("script"); //If "pass" is 0 -> fetch JSs from DOM, otherwise from target page
+		j = pass ? $.fn("script") : qa("script"); //If "pass" is 0 -> fetch JSs from DOM, otherwise from target page
 		$s.c = _rel(lk, "stylesheet"); //Extract stylesheets
 		$s.y = qa("style", head); //Extract style tags
 		$s.can = _rel(lk, "canonical"); //Extract canonical tag
@@ -483,11 +483,11 @@ class classRq { constructor() {
 		if(o === "!") return l = h; //store href in "l" (last request)
 
 		if(o === "?") { //Edin previously called this "isOK" - powerful intelligent plausibility check
-			let xs=fn.a("s");
-			if (!xs.iO("0") && !p) fn.a("a"); //if fetch is not idle and new request is standard one, do ac.abort() to set it free
+			let xs=$.fn("s");
+			if (!xs.iO("0") && !p) $.fn("a"); //if fetch is not idle and new request is standard one, do ac.abort() to set it free
 			if (xs==="1c" && p) return false; //if fetch is processing standard request and new request is prefetch, cancel prefetch until fetch is finished
 			if (xs==="1p" && p) return true; //if fetch is processing prefetch request and new request is prefetch do nothing (see [options] comment below)
-			//([semaphore options for requests] fn.a("a") -> abort previous, proceed with new | return false -> leave previous, stop new | return true -> proceed)
+			//([semaphore options for requests] $.fn("a") -> abort previous, proceed with new | return false -> leave previous, stop new | return true -> proceed)
 			return true;
 		}
 
@@ -750,7 +750,7 @@ let _init_p = () => {
 		if (!$.Rq("?", true)) return;
 		var href = $.Rq("v", e, t);
 		if ($.Rq("=", true) || !href || pfohints.find(href)) return;
-		fn.a("+", href, () => false);
+		$.fn("+", href, () => false);
 	},
 	_stopBubbling = e => (
 		e.preventDefault(),
@@ -776,7 +776,7 @@ let _init_p = () => {
 		$.Rq("!");
 		if(notPush) $.Rq("p", false);
 		_trigger("request");
-		fn.a($.Rq("h"), err => {
+		$.fn($.Rq("h"), err => {
 			if (err) {
 				lg("Error in _request : " + err);
 				_trigger("error", err);
@@ -802,18 +802,18 @@ let _init_p = () => {
 
 		if (!url || url === currentURL) return;
 		_trigger("request");
-		fn.a(url, _render);
+		$.fn(url, _render);
 	},
 	_doRender = () => {
 		_trigger("load");
-		if(bodyClasses) { var classes = fn.a("body").getAttribute("class"); bdy.setAttribute("class", classes ? classes : ""); }
+		if(bodyClasses) { var classes = $.fn("body").getAttribute("class"); bdy.setAttribute("class", classes ? classes : ""); }
 
 		var href = $.Rq("h"), title;
 		href = $.Rq("c", href);
 
 		$.hApi($.Rq("p") ? "+" : "=", href);
-		if(title = fn.a("title")) qs("title").innerHTML = title.innerHTML;
-		$.Rq("C", fn.a("-", $gthis));
+		if(title = $.fn("title")) qs("title").innerHTML = title.innerHTML;
+		$.Rq("C", $.fn("-", $gthis));
 		$.frms("a");
 
 		$.scrolly("!");
@@ -876,7 +876,7 @@ let run = () => {
 		$.scripts("i"); 
 		cache1 = new classCache1();
 		memory = new classMemory();
-		fn = getPage = new classGetPage();
+		$.fn = $.getPage = new classGetPage().a;
 		$.detScripts = new classDetScripts().a;
 		$.addAll = new classAddAll().a;
 		$.Rq = new classRq().a;
