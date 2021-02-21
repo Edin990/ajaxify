@@ -120,7 +120,7 @@ function lg(m){ $.s.verbosity && console && console.log(m); }
 // <URL> - returns page with specified URL
 // <object> - saves the page in cache
 // f - flushes the cache
-class classCache { constructor() {
+class Cache { constructor() {
 	let d = false;
             
 	this.a = function (o) {
@@ -144,7 +144,7 @@ class classCache { constructor() {
 
 // The stateful Memory class
 // Usage: $.memory(<URL>) - returns the same URL if not turned off internally
-class classMemory { constructor(options) {
+class Memory { constructor(options) {
 	let hints = 0;
 
 	this.a = function (h) {
@@ -160,7 +160,7 @@ class classMemory { constructor(options) {
 // <URL> - returns page with specified URL from internal array
 // <object> - saves the passed page in internal array
 // false - returns false
-class classPages { constructor() {
+class Pages { constructor() {
 	let d = [], i = -1;
             
     this.a = function (h) {
@@ -189,7 +189,7 @@ class classPages { constructor() {
 // x - returns response
 // otherwise - returns selection of current page to client
 
-class classGetPage { constructor() {
+class GetPage { constructor() {
 	let rsp = 0, cb = 0, plus = 0, rt = "", ct = 0, rc = 0, ac = 0;
             
 	this.a = function (o, p, p2) { 
@@ -300,7 +300,7 @@ let _lSel = $t => (
 // c - fetch canonical URL
 // <object> - handle one inline script
 // otherwise - delta loading
-class classScripts { constructor() {
+class Scripts { constructor() {
 	let $s = false, inlhints = 0, skphints = 0, txt = 0;
 	
     this.a = function (o) {
@@ -356,7 +356,7 @@ let _allstyle = $s =>
 // Fetches the canonical URL
 // Fetches all external scripts on the page
 // Fetches all inline scripts on the page
-class classDetScripts { constructor() {
+class DetScripts { constructor() {
 	let head = 0, lk = 0, j = 0;
             
 	this.a = function ($s) {
@@ -378,7 +378,7 @@ let _rel = (lk, v) => Array.prototype.filter.call(lk, e => e.getAttribute("rel")
 // pk parameter:
 // href - operate on stylesheets in the new selection
 // src - operate on JS scripts
-class classAddAll { constructor() {
+class AddAll { constructor() {
 	let $scriptsO = [], $sCssO = [], $sO = [], PK = 0, url = 0, hints = 0;
 
 	this.a = function ($this, pk) {
@@ -449,7 +449,7 @@ let _allScripts = $t => $t.forEach(e => _iScript(e)),
 // d - set / get internal "d" (data for central $.ajax())
 // C - set / get internal "can" ("href" of canonical URL)
 // c - check whether simple canonical URL is given and return, otherwise return value passed in "p"
-class classRq { constructor() {
+class RQ { constructor() {
 	let ispost = 0, data = 0, push = 0, can = 0, e = 0, c = 0, h = 0, l = false;
             
 	this.a = function (o, p, t) {
@@ -529,7 +529,7 @@ let _setE = (p, t) => h = typeof (e = p) !== "string" ? (e.currentTarget && e.cu
 // Switch (o) values:
 // d - set divs variable
 // a - Ajaxify all forms in divs
-class classFrms { constructor() {
+class Frms { constructor() {
 	let fm = 0, divs = 0;
 
 	this.a = function (o, p) {
@@ -589,7 +589,7 @@ let _k = () => {
 // Usage:
 // 1) $.offsets(<URL>) - returns offset of specified URL from internal array
 // 2) $.offsets() - saves the current URL + offset in internal array
-class classOffsets { constructor() {
+class Offsets { constructor() {
 	let d = [], i = -1;
             
 	this.a = function (h) {
@@ -614,7 +614,7 @@ let _iOffset = h => d.findIndex(e => e[0] == h)
 // Switch (o) values:
 // + - add current page to offsets
 // ! - scroll to current page offset
-class classScrolly { constructor() {
+class Scrolly { constructor() {
 
 	this.a = function (o) {
 		if(!o) return; //ensure operator
@@ -650,7 +650,7 @@ let _scrll = o => window.scrollTo(0, o)
 // Switch (o) values:
 // = - perform a replaceState, using currentURL
 // otherwise - perform a pushState, using currentURL
-class classHApi { constructor() {
+class HApi { constructor() {
             
 	this.a = function (o, p) {
 		if(!o) return; //ensure operator
@@ -667,7 +667,7 @@ class classHApi { constructor() {
 // i - initialise Pronto
 // <object> - fetch href part and continue with _request()
 // <URL> - set "h" variable of Rq hard and continue with _request()
-class classPronto { constructor() {
+class Pronto { constructor() {
 	let $gthis = 0, requestTimer = 0, pfohints = 0, pd = 150, ptim = 0;
 
 	this.a = function ($this, h) {
@@ -678,11 +678,11 @@ class classPronto { constructor() {
 			if(!$this.length) $this = "body";
 			$gthis = qa($this); //copy selection to global selector
 			if(!pfohints) pfohints = new Hints($.s.prefetchoff); //create Hints object during initialisation
-			$.frms = new classFrms().a; //initialise forms sub-plugin
+			$.frms = new Frms().a; //initialise forms sub-plugin
 			if($.s.idleTime) $.slides = new classSlides().a; //initialise optional slideshow sub-plugin
-			$.scrolly = new classScrolly().a; //initialise scroll effects sub-plugin
-			$.offsets = new classOffsets().a;
-			$.hApi = new classHApi().a;
+			$.scrolly = new Scrolly().a; //initialise scroll effects sub-plugin
+			$.offsets = new Offsets().a;
+			$.hApi = new HApi().a;
 			_init_p(); //initialise Pronto sub-plugin
 			return $this; //return query selector for chaining
 		}
@@ -820,8 +820,8 @@ $.init = () => {
 
 let run = () => {
 		$.s = Object.assign($.s, options);
-		$.pages = new classPages().a;
-		$.pronto = new classPronto().a;
+		$.pages = new Pages().a;
+		$.pronto = new Pronto().a;
 		if (load()) { 
 			$.pronto($.s.elements, "i"); 
 			if ($.s.deltas) $.scripts("1"); 
@@ -835,14 +835,14 @@ let run = () => {
 		
 		lg("Ajaxify loaded..."); //verbosity option steers, whether this initialisation message is output
 		
-		$.scripts = new classScripts().a;
+		$.scripts = new Scripts().a;
 		$.scripts("i"); 
-		$.cache = new classCache().a;
-		$.memory = new classMemory().a;
-		$.fn = $.getPage = new classGetPage().a;
-		$.detScripts = new classDetScripts().a;
-		$.addAll = new classAddAll().a;
-		$.Rq = new classRq().a;
+		$.cache = new Cache().a;
+		$.memory = new Memory().a;
+		$.fn = $.getPage = new GetPage().a;
+		$.detScripts = new DetScripts().a;
+		$.addAll = new AddAll().a;
+		$.Rq = new RQ().a;
 		return true; 
 	}
 $.init(); // initialize Ajaxify on definition
