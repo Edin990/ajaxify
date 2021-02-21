@@ -58,8 +58,12 @@ $.s = {
 	passCount: false // Show number of pass for debugging
 };
 
+$.pass = 0; $.currentURL = "";
+$.parse = (s, pl) => (pl = document.createElement('div'), pl.insertAdjacentHTML('afterbegin', s), pl.firstElementChild); // HTML parser
+$.trigger = (t, e) => { let ev = document.createEvent('HTMLEvents'); ev.initEvent("pronto." + t, true, false); ev.data = e ? e : $.Rq("e"); window.dispatchEvent(ev); }
+
 //Module global variables
-let pass = 0, currentURL = "", rootUrl = location.origin, api = window.history && window.history.pushState && window.history.replaceState,
+let rootUrl = location.origin, api = window.history && window.history.pushState && window.history.replaceState,
 
 //Regexes for escaping fetched HTML of a whole page - best of Baluptons Ajaxify
 //Makes it possible to pre-fetch an entire page
@@ -81,8 +85,6 @@ let doc=document, bdy,
     qa=(s,o=doc)=>o.querySelectorAll(s),
     qs=(s,o=doc)=>o.querySelector(s);
 
-let _parse = (s, pl) => (pl = document.createElement('div'), pl.insertAdjacentHTML('afterbegin', s), pl.firstElementChild); // HTML parser
-function _trigger(t, e){ let ev = document.createEvent('HTMLEvents'); ev.initEvent("pronto." + t, true, false); ev.data = e ? e : $.Rq("e"); window.dispatchEvent(ev); }
 function _internal(url) {
 	if (!url) return false;
 	if (typeof(url) === "object") url = url.href;
@@ -218,7 +220,7 @@ class GetPage { constructor() {
 		return qs((o === "title") ?	o : ".ajy-" + o, $.cache()); 
 };
 let _lSel = $t => (
-	pass++, 
+	$.pass++, 
 	_lEls($t), 
 	qa("body > script").forEach(e => (e.classList.contains(inlineclass)) ? e.parentNode.removeChild(e) : false), 
 	$.scripts(true), 
@@ -236,7 +238,7 @@ let _lSel = $t => (
 		if(!$h) { 
 			lg("Inserting placeholder for ID: " + $t.getAttribute("id"));
 			var tagN = $t.tagName.toLowerCase();
-			$t.parentNode.replaceChild(_parse("<" + tagN + " id='" + $t.getAttribute("id") + "'></" + tagN + ">"), $t);
+			$t.parentNode.replaceChild($.parse("<" + tagN + " id='" + $t.getAttribute("id") + "'></" + tagN + ">"), $t);
 			return; 
 		}
 
@@ -265,7 +267,7 @@ let _lSel = $t => (
 			signal: ac.signal
 		}).then(r => {
 			if (!r.ok || !_isHtml(r)) {
-				if (!pre) {location.href = hin; _cl(); $.pronto(0, currentURL);}
+				if (!pre) {location.href = hin; _cl(); $.pronto(0, $.currentURL);}
 				return;
 			}
 			rsp = r; // store response
@@ -279,14 +281,14 @@ let _lSel = $t => (
 		}).catch(err => {
 			if(err.name === "AbortError") return;
 			try {
-				_trigger("error", err); 
+				$.trigger("error", err); 
 				lg("Response text : " + err.message); 
 				return _cache(hin, err.message, err);
 			} catch (e) {}
 		}).finally(() => rc--); // reset active request counter
 	},
 	_cl = c => (plus = 0, (!c) ? cb = 0 : 0), // clear plus AND/OR callback
-	_cache = (href, h, err) => $.cache(_parse(_parseHTML(h))) && ($.pages([href, $.cache()]), 1) && cb && cb(err),
+	_cache = (href, h, err) => $.cache($.parse(_parseHTML(h))) && ($.pages([href, $.cache()]), 1) && cb && cb(err),
 	_isHtml = x => (ct = x.headers.get("content-type")) && (ct.iO("html") || ct.iO("form-")),
 	_parseHTML = h => document.createElement("html").innerHTML = _replD(h).trim(),
 	_replD = h => String(h).replace(docType, "").replace(tagso, div12).replace(tagsod, divid12).replace(tagsc, "</div>")
@@ -343,7 +345,7 @@ let _allstyle = $s =>
 		try {sc.appendChild(document.createTextNode($s.textContent))} catch(e) {sc.text = $s.textContent};
 		return qs("body").appendChild(sc);
 	},
-	_addstyle = t => qs("head").appendChild(_parse('<style>' + t + '</style>')),
+	_addstyle = t => qs("head").appendChild($.parse('<style>' + t + '</style>')),
 	_addScripts = $s => ( $.addAll($s.c, "href"), $.s.inlinesync ? setTimeout(() => $.addAll($s.j, "src")) : $.addAll($s.j, "src"))
 }}
 
@@ -357,10 +359,10 @@ class DetScripts { constructor() {
 	let head = 0, lk = 0, j = 0;
             
 	this.a = function ($s) {
-		head = pass ? $.fn("head") : qs("head"); //If "pass" is 0 -> fetch head from DOM, otherwise from target page
+		head = $.pass ? $.fn("head") : qs("head"); //If "pass" is 0 -> fetch head from DOM, otherwise from target page
 		if (!head) return true;
-		lk = qa(pass ? ".ajy-link" : "link", head); //If "pass" is 0 -> fetch links from DOM, otherwise from target page
-		j = pass ? $.fn("script") : qa("script"); //If "pass" is 0 -> fetch JSs from DOM, otherwise from target page
+		lk = qa($.pass ? ".ajy-link" : "link", head); //If "pass" is 0 -> fetch links from DOM, otherwise from target page
+		j = $.pass ? $.fn("script") : qa("script"); //If "pass" is 0 -> fetch JSs from DOM, otherwise from target page
 		$s.c = _rel(lk, "stylesheet"); //Extract stylesheets
 		$s.y = qa("style", head); //Extract style tags
 		$s.can = _rel(lk, "canonical"); //Extract canonical tag
@@ -388,7 +390,7 @@ class AddAll { constructor() {
 
 		$scriptsO = PK == "href" ? $sCssO : $sO; //Copy old.  Stylesheets or JS
 
-		if(!pass) _newArray($this); //Fill new array on initial load, nothing more
+		if(!$.pass) _newArray($this); //Fill new array on initial load, nothing more
 		else $this.forEach(function(s) { //Iterate through selection
 			var $t = s;
 			url = $t.getAttribute(PK);
@@ -415,7 +417,7 @@ let _allScripts = $t => $t.forEach(e => _iScript(e)),
 	_iScript = $S => { 
 		url = $S.getAttribute(PK);
 
-		if(PK == "href") return qs("head").appendChild(_parse(linki.replace("*", url))); 
+		if(PK == "href") return qs("head").appendChild($.parse(linki.replace("*", url))); 
 		if(!url) return $.scripts($S); 
 		
 		var sc = document.createElement("script");
@@ -448,9 +450,9 @@ class RQ { constructor() {
             
 	this.a = function (o, p, t) {
 		if(o === "=") { 
-			if(p) return h === currentURL //check whether internally stored "href" ("h") variable is the same as the global currentURL
+			if(p) return h === $.currentURL //check whether internally stored "href" ("h") variable is the same as the global currentURL
 			|| h === l; //or href of last request ("l")
-			return h === currentURL; //for click requests
+			return h === $.currentURL; //for click requests
 		}
 
 		if(o === "!") return l = h; //store href in "l" (last request)
@@ -533,7 +535,7 @@ class Frms { constructor() {
 		if(o === "a") divs.forEach(div => { //iterate through divs
 		Array.prototype.filter.call(qa($.s.forms, div), function(e) { //filter forms
 			let c = e.getAttribute("action");
-			return(_internal(c && c.length > 0 ? c : currentURL)); //ensure "action"
+			return(_internal(c && c.length > 0 ? c : $.currentURL)); //ensure "action"
 		}).forEach(frm => { //iterate through forms
 		frm.addEventListener("submit", q => { //create event listener
 			fm = q.target; // fetch target
@@ -545,7 +547,7 @@ class Frms { constructor() {
 
 			var h, a = fm.getAttribute("action"); //fetch action attribute
 			if (a && a.length > 0) h = a; //found -> store
-			else h = currentURL; //not found -> select current URL
+			else h = $.currentURL; //not found -> select current URL
 
 			$.Rq("v", q); //validate request
 
@@ -555,7 +557,7 @@ class Frms { constructor() {
 				$.Rq("d", p); //save data in request data
 			}
 
-			_trigger("submit", h); //raise pronto.submit event
+			$.trigger("submit", h); //raise pronto.submit event
 			$.pronto(0, { href: h }); //programmatically change page
 
 			q.preventDefault(); //prevent default form action
@@ -595,7 +597,7 @@ class Offsets { constructor() {
 		}
 
 		//Add page offset
-		var u = currentURL, us1 = u.iO("?") ? u.split("?")[0] : u, us = us1.iO("#") ? us1.split("#")[0] : us1, os = [us, (document.documentElement && document.documentElement.scrollTop) || document.body.scrollTop];
+		var u = $.currentURL, us1 = u.iO("?") ? u.split("?")[0] : u, us = us1.iO("#") ? us1.split("#")[0] : us1, os = [us, (document.documentElement && document.documentElement.scrollTop) || document.body.scrollTop];
 		i = _iOffset(us); //get page index
 		if(i === -1) d.push(os); //doesn't exist -> push to array
 		else d[i] = os; //exists -> overwrite
@@ -615,7 +617,7 @@ class Scrolly { constructor() {
 
 		var op = o; //cache operator
 
-		if(o === "+" || o === "!") o = currentURL; //fetch currentURL for "+" and "-" operators
+		if(o === "+" || o === "!") o = $.currentURL; //fetch currentURL for "+" and "-" operators
 
 		if(op !== "+" && o.iO("#") && (o.iO("#") < o.length - 1)) { //if hash in URL and not standalone hash
 			let $el = qs("#" + o.split("#")[1]); //fetch the element
@@ -648,10 +650,10 @@ class HApi { constructor() {
             
 	this.a = function (o, p) {
 		if(!o) return; //ensure operator
-		if(p) currentURL = p; //if p given -> update current URL
+		if(p) $.currentURL = p; //if p given -> update current URL
 
-		if(o === "=") history.replaceState({ url: currentURL }, "state-" + currentURL, currentURL); //perform replaceState
-		else if (currentURL !== window.location.href) history.pushState({ url: currentURL }, "state-" + currentURL, currentURL); //perform pushState
+		if(o === "=") history.replaceState({ url: $.currentURL }, "state-" + $.currentURL, $.currentURL); //perform replaceState
+		else if ($.currentURL !== window.location.href) history.pushState({ url: $.currentURL }, "state-" + $.currentURL, $.currentURL); //perform pushState
 	};
 }}
 
@@ -737,18 +739,18 @@ let _init_p = () => {
 	_request = notPush => {
 		$.Rq("!");
 		if(notPush) $.Rq("p", false);
-		_trigger("request");
+		$.trigger("request");
 		$.fn($.Rq("h"), err => {
 			if (err) {
 				lg("Error in _request : " + err);
-				_trigger("error", err);
+				$.trigger("error", err);
 			}
 
 			_render();
 		});
 	},
 	_render = () => {
-		_trigger("beforeload");
+		$.trigger("beforeload");
 		if($.s.requestDelay) {
 			if(requestTimer) clearTimeout(requestTimer);
 			requestTimer = setTimeout(_doRender, $.s.requestDelay);
@@ -762,12 +764,12 @@ let _init_p = () => {
 		$.Rq("p", false);
 		$.scrolly("+");
 
-		if (!url || url === currentURL) return;
-		_trigger("request");
+		if (!url || url === $.currentURL) return;
+		$.trigger("request");
 		$.fn(url, _render);
 	},
 	_doRender = () => {
-		_trigger("load");
+		$.trigger("load");
 		if($.s.bodyClasses) { var classes = $.fn("body").getAttribute("class"); bdy.setAttribute("class", classes ? classes : ""); }
 
 		var href = $.Rq("h"), title;
@@ -780,8 +782,8 @@ let _init_p = () => {
 
 		$.scrolly("!");
 		_gaCaptureView(href);
-		_trigger("render");
-		if($.s.passCount) qs("#" + $.s.passCount).innerHTML = "Pass: " + pass;
+		$.trigger("render");
+		if($.s.passCount) qs("#" + $.s.passCount).innerHTML = "Pass: " + $.pass;
 		if($.s.cb) $.s.cb();
 	},
 	_gaCaptureView = href => {
