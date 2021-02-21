@@ -10,8 +10,6 @@
 
 Simplest plugin call:
 
-/// Vanilla javascript variant ///
-
 let ajaxify = new Ajaxify({options});
 Ajaxifies the whole site, dynamically replacing the elements specified in "elements" across pages
 
@@ -61,7 +59,7 @@ $.s = {
 };
 
 //Module global variables
-let lvl = 0, pass = 0, currentURL = "", rootUrl = location.origin, api = window.history && window.history.pushState && window.history.replaceState,
+let pass = 0, currentURL = "", rootUrl = location.origin, api = window.history && window.history.pushState && window.history.replaceState,
 
 //Regexes for escaping fetched HTML of a whole page - best of Baluptons Ajaxify
 //Makes it possible to pre-fetch an entire page
@@ -74,7 +72,6 @@ tagsc = /<\/(html|head|body|link)\>/gi,
 div12 = '<div class="ajy-$1"$2',
 divid12 = '<div id="ajy-$1"$2',
 linki = '<link rel="stylesheet" type="text/css" href="*" />',
-scri = '<script src="*"></script>',
 linkr = 'link[href*="!"]', 
 scrr = 'script[src*="!"]',
 inlineclass = "ajy-inline";
