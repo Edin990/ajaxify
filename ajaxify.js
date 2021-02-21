@@ -76,7 +76,6 @@ linkr = 'link[href*="!"]',
 scrr = 'script[src*="!"]',
 inlineclass = "ajy-inline";
 
-
 //Global helpers
 let doc=document, bdy,
     qa=(s,o=doc)=>o.querySelectorAll(s),
@@ -293,7 +292,6 @@ let _lSel = $t => (
 	_replD = h => String(h).replace(docType, "").replace(tagso, div12).replace(tagsod, divid12).replace(tagsc, "</div>")
 }}
 
-
 // The stateful Scripts plugin
 // First parameter "o" is switch:
 // i - initailise options
@@ -348,6 +346,7 @@ let _allstyle = $s =>
 	_addstyle = t => qs("head").appendChild(_parse('<style>' + t + '</style>')),
 	_addScripts = $s => ( $.addAll($s.c, "href"), $.s.inlinesync ? setTimeout(() => $.addAll($s.j, "src")) : $.addAll($s.j, "src"))
 }}
+
 // The DetScripts plugin - stands for "detach scripts"
 // Works on "$s" <object> that is passed in and fills it
 // Fetches all stylesheets in the head
@@ -369,7 +368,6 @@ class DetScripts { constructor() {
 	};
 let _rel = (lk, v) => Array.prototype.filter.call(lk, e => e.getAttribute("rel").iO(v));
 }}
-
 
 // The AddAll plugin
 // Works on a new selection of scripts to apply delta-loading to it 
@@ -427,7 +425,6 @@ let _allScripts = $t => $t.forEach(e => _iScript(e)),
 	},
 	_removeScript = () => qa((PK == "href" ? linkr : scrr).replace("!", url)).forEach(e => e.parentNode.removeChild(e))
 }}
-
 
 // The Rq plugin - stands for request
 // Stores all kinds of and manages data concerning the pending request
@@ -842,5 +839,4 @@ let run = () => {
 		return true; 
 	}
 $.init(); // initialize Ajaxify on definition
-
 }}
