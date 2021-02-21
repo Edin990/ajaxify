@@ -108,9 +108,11 @@ function _on(eventName, elementSelector, handler, el = document) { //e.currentTa
 	}, !!eventName.iO('mo'));
 }
 
-function Hints(hints) {	 var myHints = (typeof hints === 'string' && hints.length) ? hints.split(", ") : false; //hints are passed as a comma separated string
-	this.find = t => (!t || !myHints) ? false : myHints.some(h => t.iO(h)) //iterate through hints within passed text (t)
+function Hints(hints) {
+    if (!(this instanceof Hints)) return new Hints(hints); //automatically create an instance
+    this.myHints = (typeof hints === 'string' && hints.length > 0) ? hints.split(", ") : false; //hints are passed as a comma separated string 
 }
+Hints.prototype.find = function (t) {return (!t || !this.myHints) ? false : this.myHints.some(h => t.iO(h))}; //iterate through hints within passed text (t)
 
 function lg(m){ $.s.verbosity && console && console.log(m); }
 
