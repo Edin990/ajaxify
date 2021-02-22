@@ -461,7 +461,7 @@ class RQ { constructor() {
 			let xs=$.fn("s");
 			if (!xs.iO("0") && !p) $.fn("a"); //if fetch is not idle and new request is standard one, do ac.abort() to set it free
 			if (xs==="1c" && p) return false; //if fetch is processing standard request and new request is prefetch, cancel prefetch until fetch is finished
-			if (xs==="1p" && p) return true; //if fetch is processing prefetch request and new request is prefetch do nothing (see [options] comment below)
+			if (xs==="1p" && p) $.s.memoryoff ? $.fn("a") : 1; //if fetch is processing prefetch request and new request is prefetch do nothing (see [options] comment below)
 			//([semaphore options for requests] $.fn("a") -> abort previous, proceed with new | return false -> leave previous, stop new | return true -> proceed)
 			return true;
 		}
