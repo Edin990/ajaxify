@@ -110,11 +110,8 @@ function _on(eventName, elementSelector, handler, el = document) { //e.currentTa
 	}, !!eventName.iO('mo'));
 }
 
-function Hints(hints) {
-    if (!(this instanceof Hints)) return new Hints(hints); //automatically create an instance
-    this.myHints = (typeof hints === 'string' && hints.length > 0) ? hints.split(", ") : false; //hints are passed as a comma separated string 
-}
-Hints.prototype.find = function (t) {return (!t || !this.myHints) ? false : this.myHints.some(h => t.iO(h))}; //iterate through hints within passed text (t)
+function Hints(h) { this.hints = (typeof h === 'string' && h.length > 0) ? h.split(", ") : false; } //hints are passed as a comma separated string 
+Hints.prototype.find = function (t) {return (!t || !this.hints) ? false : this.hints.some(h => t.iO(h))}; //iterate through hints within passed text (t)
 
 function lg(m){ $.s.verbosity && console && console.log(m); }
 
@@ -149,11 +146,12 @@ class Cache { constructor() {
 // The stateful Memory class
 // Usage: $.memory(<URL>) - returns the same URL if not turned off internally
 class Memory { constructor(options) {
+	$.s.memoryoff = new Hints($.s.memoryoff);
 
 	this.a = function (h) {
 		if (!h || $.s.memoryoff === true) return false; 
 		if ($.s.memoryoff === false) return h; 
-		return Hints($.s.memoryoff).find(h) ? false : h; 
+		return $.s.memoryoff.find(h) ? false : h; 
 	};           
 }}
 
@@ -303,6 +301,8 @@ let _lSel = $t => (
 // otherwise - delta loading
 class Scripts { constructor() {
 	let $s = false, txt = 0;
+	$.s.inlinehints = new Hints($.s.inlinehints);
+	$.s.inlineskip = new Hints($.s.inlineskip);
 	
     this.a = function (o) {
 		if (o === "i") { 
@@ -331,8 +331,8 @@ let _allstyle = $s =>
 	),
 	_onetxt = $s => 
 		(!(txt = $s.textContent).iO(").ajaxify(") && (!txt.iO("new Ajaxify(")) && 
-			(($.s.inline && !Hints($.s.inlineskip).find(txt)) || $s.classList.contains("ajaxy") || 
-			Hints($.s.inlinehints).find(txt))
+			(($.s.inline && !$.s.inlineskip.find(txt)) || $s.classList.contains("ajaxy") || 
+			$.s.inlinehints.find(txt))
 		) && _addtxt($s),
 	_addtxt = $s => { 
 		if(!txt || !txt.length) return; 
@@ -379,6 +379,7 @@ let _rel = (lk, v) => Array.prototype.filter.call(lk, e => e.getAttribute("rel")
 // src - operate on JS scripts
 class AddAll { constructor() {
 	let $scriptsO = [], $sCssO = [], $sO = [], PK = 0, url = 0;
+	$.s.alwayshints = new Hints($.s.alwayshints);
 
 	this.a = function ($this, pk) {
 		if(!$this.length) return; //ensure input
@@ -414,7 +415,7 @@ class AddAll { constructor() {
 };
 let _allScripts = $t => $t.forEach(e => _iScript(e)),
 	_newArray = $t => $t.forEach(e => (url = e.getAttribute(PK)) ? $scriptsO.push(url) : 0),
-	_classAlways = $t => $t.getAttribute("data-class") == "always" || Hints($.s.alwayshints).find(url),
+	_classAlways = $t => $t.getAttribute("data-class") == "always" || $.s.alwayshints.find(url),
 	_iScript = $S => { 
 		url = $S.getAttribute(PK);
 
@@ -666,6 +667,7 @@ class HApi { constructor() {
 // <URL> - set "h" variable of Rq hard and continue with _request()
 class Pronto { constructor() {
 	let $gthis = 0, requestTimer = 0, pd = 150, ptim = 0;
+	$.s.prefetchoff = new Hints($.s.prefetchoff);
 
 	this.a = function ($this, h) {
 		if(!h) return; //ensure data
@@ -714,7 +716,7 @@ let _init_p = () => {
 		if($.s.prefetchoff === true) return;
 		if (!$.Rq("?", true)) return;
 		var href = $.Rq("v", e, t);
-		if ($.Rq("=", true) || !href || Hints($.s.prefetchoff).find(href)) return;
+		if ($.Rq("=", true) || !href || $.s.prefetchoff.find(href)) return;
 		$.fn("+", href, () => false);
 	},
 	_stopBubbling = e => (
