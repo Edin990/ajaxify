@@ -50,7 +50,8 @@ $.s = {
 	intevents: true, // intercept events that are fired only on classic page load and simulate their trigger on ajax page load ("DOMContentLoaded", "load")
 	style : true, // true = all style tags in the head loaded, false = style tags on target page ignored
 	prefetchoff : false, // Plugin pre-fetches pages on hoverIntent - true = set off completely // strings - separated by ", " - hints to select out
- 
+	cachetimeout: 5000, // time in miliseconds for cache to be invalidated (per individual page)
+
 // debugging & advanced settings
 	verbosity : 0, //Debugging level to console: default off.	Can be set to 10 and higher (in case of logging enabled)
 	memoryoff : false, // strings - separated by ", " - if matched in any URLs - only these are NOT executed - set to "true" to disable memory completely
@@ -133,7 +134,7 @@ class Cache { constructor() {
 			if(o === "f") { //"f" passed -> flush
 				$.pages("f"); //delegate flush to $.pages
 				lg("Cache flushed");
-			} else d = $.pages($.memory(o)); //URL passed -> look up page in memory
+			} else d = $.pages(o); //URL passed -> look up page in memory
 
 			return d; //return cached page
 		}
@@ -163,23 +164,21 @@ class Memory { constructor(options) {
 // <object> - saves the passed page in internal array
 // false - returns false
 class Pages { constructor() {
-	let d = [], i = -1;
-            
+	let d = {};
+
     this.a = function (h) {
 		if (typeof h === "string") { 
-			if(h === "f") d = []; 
-			else if((i=_iPage(h)) !== -1) return d[i][1]; 
+			if(h === "f") d = {};
+			else if (d[h] && !(!$.h.prefetchoff.find(h) && !$.memory(h) && (Date.now() - d[h].time) > $.s.cachetimeout)) return d[h][1];
 		}
 
 		if (typeof h === "object") { 
-			if((i=_iPage(h)) === -1) d.push(h); 
-			else d[i] = h; 
+			h.time = Date.now();
+			d[h[0]] = h;
 		}
 
 		if (typeof h === "boolean") return false; 
 	};
-		
-	let _iPage = h => d.findIndex(e => e[0] == h)
 }}
 
 // The GetPage class
