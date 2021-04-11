@@ -615,7 +615,7 @@ let _iOffset = h => d.findIndex(e => e[0] == h)
 // + - add current page to offsets
 // ! - scroll to current page offset
 class Scrolly { constructor() {
-
+	let sb = getComputedStyle(qs(":root")).scrollBehavior; // store html scroll-behavior css preference
 	if ('scrollRestoration' in history) history.scrollRestoration = 'manual';
 
 	this.a = function (o) {
@@ -644,7 +644,7 @@ class Scrolly { constructor() {
 
 		//default -> do nothing
 	};
-let _scrll = o => o ? window.scrollTo(0, o) : setTimeout(() => window.scrollTo(0, 0), 10) //delay of 10 milliseconds on scroll top
+let _scrll = o => window.scrollTo({left: 0, top: o, behavior: o ? sb : 'auto'});
 }}
 
 // The hApi plugin - manages operations on the History API centrally
